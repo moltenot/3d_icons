@@ -49,8 +49,8 @@ loader.load(
   "/eurocopter.stl", // loaded from the static folder by parcel-plugin-static-files-copy
   function (geometry) {
     console.log("loaded geometry", geometry);
-    // const mesh = Mesh(geometry, groundMaterial);
-    // scene.add(mesh);
+    const mesh = new Mesh(geometry, groundMaterial);
+    scene.add(mesh);
   },
   (xhr) => {
     console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
