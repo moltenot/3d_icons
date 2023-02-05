@@ -49,8 +49,9 @@ loader.load(
   "/eurocopter.stl", // loaded from the static folder by parcel-plugin-static-files-copy
   function (geometry) {
     console.log("loaded geometry", geometry);
-    const mesh = new Mesh(geometry, groundMaterial);
-    scene.add(mesh);
+    const eurocopter = new Mesh(geometry, groundMaterial);
+    eurocopter.rotation.x = -Math.PI / 2
+    scene.add(eurocopter);
   },
   (xhr) => {
     console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
@@ -59,13 +60,6 @@ loader.load(
     console.error(error);
   }
 );
-
-// ground
-const plane = new Mesh(new PlaneGeometry(40, 40), groundMaterial);
-plane.rotation.x = -Math.PI / 2;
-plane.position.y = -0.5;
-scene.add(plane);
-plane.receiveShadow = true;
 
 camera.position.z = 3;
 
