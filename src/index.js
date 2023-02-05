@@ -1,8 +1,27 @@
-import { PerspectiveCamera, Scene, WebGLRenderer, BoxGeometry, MeshBasicMaterial, Mesh } from "three";
+import {
+  PerspectiveCamera,
+  Scene,
+  WebGLRenderer,
+  BoxGeometry,
+  MeshBasicMaterial,
+  Mesh,
+  AxesHelper,
+  SpotLight,
+  LineLoop,
+  PlaneGeometry,
+  MeshPhongMaterial,
+} from "three";
+import { STLLoader } from "three/examples/jsm/loaders/STLLoader";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
-// const scene = new Scene()
-
+// largely based on https://sbcode.net/threejs/loaders-stl/
 const scene = new Scene();
+scene.add(new AxesHelper(5));
+
+const light = new SpotLight();
+light.position.set(20, 20, 20);
+scene.add(light);
+
 const camera = new PerspectiveCamera(
   75,
   window.innerWidth / window.innerHeight,
@@ -14,31 +33,46 @@ const renderer = new WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// aad a cube (from default tutorial)
-const geometry = new BoxGeometry(1, 1, 1);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+
+// green material
 const material = new MeshBasicMaterial({ color: 0x00ff00 });
-const cube = new Mesh(geometry, material);
-scene.add(cube);
 
-// // add a eurocopter
-// const loader = new GLTFLoader();
-// loader.load(
-//   "blender/euroocopter.glb",
-//   function (gltf) {
-//     scene.add(gltf.scene);
-//   },
-//   undefined,
-//   function (error) {
-//     console.error(error);
-//   }
-// );
+// add a eurocopter
+const loader = new STLLoader();
+loader.load(
+  "/eurocopter.stl", // loaded from the static folder by parcel-plugin-static-files-copy
+  function (geometry) {
+    console.log("loaded geometry", geometry);
+    const mesh = Mesh(geometry, material);
+    scene.add(mesh);
+  },
+  (xhr) => {
+    console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+  },
+  function (error) {
+    console.error(error);
+  }
+);
 
-camera.position.z = 5;
+// ground
+
+const plane = new Mesh(
+  new PlaneGeometry(40, 40),
+  new MeshPhongMaterial({ color: 0x999999, specular: 0x101010 })
+);
+plane.rotation.x = -Math.PI / 2;
+plane.position.y = -0.5;
+scene.add(plane);
+
+plane.receiveShadow = true;
+
+camera.position.z = 3;
 
 function animate() {
   requestAnimationFrame(animate);
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
+  controls.update();
   renderer.render(scene, camera);
 }
 animate();
