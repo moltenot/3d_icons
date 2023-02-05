@@ -38,6 +38,10 @@ controls.enableDamping = true;
 
 // green material
 const material = new MeshBasicMaterial({ color: 0x00ff00 });
+const groundMaterial = new MeshPhongMaterial({
+  color: 0x999999,
+  specular: 0x101010,
+});
 
 // add a eurocopter
 const loader = new STLLoader();
@@ -45,27 +49,22 @@ loader.load(
   "/eurocopter.stl", // loaded from the static folder by parcel-plugin-static-files-copy
   function (geometry) {
     console.log("loaded geometry", geometry);
-    const mesh = Mesh(geometry, material);
-    scene.add(mesh);
+    // const mesh = Mesh(geometry, groundMaterial);
+    // scene.add(mesh);
   },
   (xhr) => {
     console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
   },
-  function (error) {
+  (error) => {
     console.error(error);
   }
 );
 
 // ground
-
-const plane = new Mesh(
-  new PlaneGeometry(40, 40),
-  new MeshPhongMaterial({ color: 0x999999, specular: 0x101010 })
-);
+const plane = new Mesh(new PlaneGeometry(40, 40), groundMaterial);
 plane.rotation.x = -Math.PI / 2;
 plane.position.y = -0.5;
 scene.add(plane);
-
 plane.receiveShadow = true;
 
 camera.position.z = 3;
